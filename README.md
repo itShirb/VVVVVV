@@ -1,3 +1,26 @@
+# Shirb's VVVVVV fork
+This is my fork of VVVVVV's source code. My goal is to add certain features that I personally want to see in the game, and hope to one day be pulled into the main repository.
+
+### TODO:
+- Un-hardcode The Tower ~ Either gonna make so you place two entities, one marking the bottom and one marking the top of a segment, or part of the level metadata, or maybe even an internal scripting function
+- ~~Add teleporter entity~~ ~ Complete, however I did this before realizing that another fork already has this so idk what to do about that lmao
+- Make `telesave()` work in custom levels
+- Ability to load other levels from the current level, while retaining stats n such like the base game can do (i.e., intermission segments being outside the main game's level
+- Allow `loadscript()` to load custom level scripts
+- Make `teleportscript()`/`clearteleportscript()` work in custom levels
+- Add checks for player being grounded (ceiling or floor), as well as delays similar to `untilbars()` that run until player is grounded
+- Allow `flipgravity()` to unflip crewmates
+- Allow moving during `delay(x)`
+- Make `nocontrol()` only disable input and not the game's ability to have the player walk in a cutscene
+- Add the rest of the enemies in the game that you for some reason aren't allowed to (properly) spawn in custom levels (whether via createentity or level editor)
+- Allow positioning textbox above terminal that is closest to the player
+- Add `cflash(x,ef,d)` to streamline flashes in internal scripting
+- Rename `customposition(type,above/below)` to `rescuecrewpos(type,above/below)` for my own sanity
+- Add helpful functions in the form of gamestates or outright new custom functions
+- *...add more stuff to this later...*
+
+
+---
 This is the source code to VVVVVV, version 2.0+. For more context about this release, see the [announcement](http://distractionware.com/blog/2020/01/vvvvvv-is-now-open-source/) on Terry's blog!
 
 License
