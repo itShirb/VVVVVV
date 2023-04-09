@@ -149,7 +149,8 @@ void KeyPoll::Poll(void)
         case SDL_KEYDOWN:
         {
             keymap[evt.key.keysym.sym] = true;
-
+		
+	    if(evt.key.keysym.sym == SDLK_q) VVV_exit(0);
             if (evt.key.keysym.sym == SDLK_BACKSPACE)
             {
                 pressedbackspace = true;

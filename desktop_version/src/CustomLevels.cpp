@@ -39,6 +39,8 @@
 #define _POSIX_SOURCE
 #endif
 #include <inttypes.h>
+#include <sstream>
+
 #endif
 
 #define VMULT(y) (y * SCREEN_WIDTH_TILES * maxwidth)
@@ -1098,6 +1100,7 @@ bool customlevelclass::load(std::string _path)
                 {
                     level_font_name = pText_;
                 }
+
             }
         }
 
@@ -1109,11 +1112,11 @@ bool customlevelclass::load(std::string _path)
         {
             mapheight = help.Int(pText);
         }
+
         if (SDL_strcmp(pKey, "levmusic") == 0)
         {
             levmusic = help.Int(pText);
         }
-
 
         if (SDL_strcmp(pKey, "contents") == 0 && pText[0] != '\0')
         {
@@ -1552,6 +1555,7 @@ bool customlevelclass::save(const std::string& _path)
         edentityElement->SetAttribute( "p4", customentities[i].p4);
         edentityElement->SetAttribute( "p5", customentities[i].p5);
         edentityElement->SetAttribute(  "p6", customentities[i].p6);
+		edentityElement->SetAttribute("isteleporter", customentities[i].isTeleporter);
         edentityElement->LinkEndChild( doc.NewText( customentities[i].scriptname.c_str() )) ;
         msg->LinkEndChild( edentityElement );
     }

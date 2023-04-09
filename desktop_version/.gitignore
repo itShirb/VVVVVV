@@ -1,5 +1,7 @@
 # Build objects
 build/
+cmake-build-debug
+cmake-build-release
 flibitBuild/
 CMakeCache.txt
 CMakeFiles/
@@ -17,3 +19,6 @@ data.zip
 
 # macOS files
 .DS_Store
+
+# ignore ide config
+.idea

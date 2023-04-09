@@ -15,6 +15,7 @@
 #include "Script.h"
 #include "Unused.h"
 #include "UtilityClass.h"
+#include "Vlogging.h"
 
 mapclass::mapclass(void)
 {
@@ -418,18 +419,18 @@ void mapclass::roomnamechange(const int x, const int y, const char** lines, cons
 
 void mapclass::initcustommapdata(void)
 {
+	teleporters.clear();
     shinytrinkets.clear();
 
 #if !defined(NO_CUSTOM_LEVELS)
     for (size_t i = 0; i < customentities.size(); i++)
     {
         const CustomEntity& ent = customentities[i];
-        if (ent.t != 9)
-        {
-            continue;
-        }
-
-        settrinket(ent.rx, ent.ry);
+        if (ent.t == 9)settrinket(ent.rx, ent.ry);
+        else if(ent.t==14) {
+			vlog_info("balls");
+			setteleporter(ent.rx, ent.ry);
+		}
     }
 #endif
 }
@@ -1886,6 +1887,9 @@ void mapclass::loadlevel(int rx, int ry)
             case 13: // Warp Tokens
                 obj.createentity(ex, ey, 13, ent.p1, ent.p2);
                 break;
+			case 14: // Teleporters
+				obj.createentity(ex, ey, 14);
+				break;
             case 15: // Collectable crewmate
                 obj.createentity(ex - 4, ey + 1, 55, cl.findcrewmate(edi), ent.p1, ent.p2);
                 break;

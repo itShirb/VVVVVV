@@ -48,6 +48,7 @@ editorclass::editorclass(void)
     register_tool(EditorTool_WARP_TOKENS, "Warp Tokens", "U", SDLK_u, false);
     register_tool(EditorTool_WARP_LINES, "Warp Lines", "I", SDLK_i, false);
     register_tool(EditorTool_CREWMATES, "Crewmates", "O", SDLK_o, false);
+	register_tool(EditorTool_TELEPORTER, "Teleporter", "K", SDLK_k, false);
     register_tool(EditorTool_START_POINT, "Start Point", "P", SDLK_p, false);
 }
 
@@ -715,6 +716,10 @@ static void draw_entities(void)
                 font::print(PR_BOR | PR_CJK_HIGH, x, y - 8, text, 210, 210, 255);
                 break;
             }
+			case 14: // Teleporter
+				graphics.drawtele(x,y,0,graphics.getRGB(16,16,16));
+				graphics.draw_rect(x,y,96,96,graphics.getRGB(255, 164, 164));
+				break;
             case 15: // Crewmates
                 graphics.draw_sprite(x - 4, y, 144, graphics.crewcolourreal(entity->p1));
                 graphics.draw_rect(x, y, 16, 24, graphics.getRGB(164, 164, 164));
@@ -1048,6 +1053,9 @@ static void draw_cursor(void)
             font::print(PR_FONT_8X8, x, y, "X", 255, 0, 0);
         }
         break;
+	case EditorTool_TELEPORTER:
+		graphics.draw_rect(x,y,96,96,blue);
+		break;
     case EditorTool_TERMINALS:
     case EditorTool_CREWMATES:
     case EditorTool_START_POINT:
@@ -1428,6 +1436,9 @@ void editorclass::draw_tool(EditorTools tool, int x, int y)
     case EditorTool_START_POINT:
         graphics.draw_sprite(x, y, 184, graphics.col_crewcyan);
         break;
+	case EditorTool_TELEPORTER:
+		graphics.drawtele(x,y,0,graphics.getRGB(98,98,98));
+		break;
     default:
         break;
     }
@@ -2303,6 +2314,10 @@ void editorclass::tool_place()
             show_note(loc::gettext("ERROR: Max number of crewmates is 100"));
         }
         break;
+	case EditorTool_TELEPORTER:
+		add_entity(levx, levy, tilex, tiley, 14, 0);
+		vlog_info("place(?)");
+		break;
     case EditorTool_START_POINT:
         //If there is another start point, destroy it
         for (size_t i = 0; i < customentities.size(); i++)

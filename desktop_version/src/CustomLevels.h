@@ -14,6 +14,7 @@ public:
     int x, y, t;
     //parameters
     int p1, p2, p3, p4, p5, p6;
+	bool isTeleporter;
     std::string scriptname;
 };
 
@@ -53,6 +54,7 @@ struct LevelMetaData
     std::string Desc3;
     std::string website;
     std::string filename;
+
 
     std::string modifier;
     std::string timeCreated;
@@ -162,7 +164,6 @@ public:
 
     int levmusic;
     int mapwidth, mapheight; //Actual width and height of stage
-
     std::string level_font_name;
 
     int version;

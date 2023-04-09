@@ -29,7 +29,7 @@ enum EditorTools
     EditorTool_WARP_LINES,
     EditorTool_CREWMATES,
     EditorTool_START_POINT,
-
+	EditorTool_TELEPORTER,
     NUM_EditorTools
 };
 

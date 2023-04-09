@@ -2884,7 +2884,6 @@ void scriptclass::startgamemode(const enum StartMode mode)
         /* Invalidate Flip Mode trophy */
         obj.flags[73] = true;
     }
-
     obj.entities.clear();
     obj.createentity(game.savex, game.savey, 0, 0);
     if (player_hitbox.initialized)
@@ -2904,6 +2903,7 @@ void scriptclass::startgamemode(const enum StartMode mode)
 
     map.resetplayer();
     map.gotoroom(game.saverx, game.savery);
+	vlog_info("currently here");
     map.initmapdata();
 #ifndef NO_CUSTOM_LEVELS
     if (map.custommode)

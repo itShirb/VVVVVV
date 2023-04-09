@@ -67,7 +67,7 @@ void Screen::init(const struct ScreenSettings* settings)
         vlog_error("Could not create window: %s", SDL_GetError());
         VVV_exit(1);
     }
-
+    SDL_SetWindowInputFocus(m_window);
     m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 
     if (m_renderer == NULL)
