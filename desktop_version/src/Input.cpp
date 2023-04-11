@@ -2388,7 +2388,7 @@ void gameinput(void)
     //game.mx = (mouseX / 2);
     //game.my = (mouseY / 2);
 
-    if(!script.running)
+    if(!script.running || script.scriptallowmove)
     {
         if (roomname_translator::enabled && roomname_translator::overlay_input())
         {
@@ -2421,7 +2421,7 @@ void gameinput(void)
     }
 
     game.press_map = false;
-    if (key.isDown(KEYBOARD_ENTER) || key.isDown(SDLK_KP_ENTER) || key.isDown(game.controllerButton_map)  )
+    if (key.isDown(KEYBOARD_ENTER) || key.isDown(SDLK_KP_ENTER) || key.isDown(game.controllerButton_map))
     {
         game.press_map = true;
     }

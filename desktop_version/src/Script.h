@@ -107,6 +107,7 @@ public:
     int looppoint, loopcount;
 
     int scriptdelay;
+	bool scriptallowmove;
     bool running;
 
     // Textbox stuff

@@ -170,6 +170,8 @@ public:
     void clamp_tilecol(const int rx, const int ry, const bool wrap);
     void switch_enemy(const bool reversed);
     void switch_warpdir(const bool reversed);
+	void switch_towermode(const bool reversed);
+	void switch_scrolldir(const bool reversed);
 
     EditorStates state;
     EditorSubStates substate;

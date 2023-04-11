@@ -1099,12 +1099,11 @@ static void draw_tile_drawer(int tileset)
         {
             for (int y = 0; y < 5; y++)
             {
-                if (tileset == 0)
-                {
+                if (tileset == 0){
                     graphics.drawtile(x * 8, (y * 8) - t2, (temp + numtiles + (y * SCREEN_WIDTH_TILES) + x) % numtiles);
-                }
-                else
-                {
+                }else if(tileset==5){
+					graphics.drawtile3(x * 8, (y * 8) - t2, (temp + numtiles + (y * SCREEN_WIDTH_TILES) + x) % numtiles, 0, 0);
+				}else{
                     graphics.drawtile2(x * 8, (y * 8) - t2, (temp + numtiles + (y * SCREEN_WIDTH_TILES) + x) % numtiles);
                 }
             }
@@ -1127,6 +1126,9 @@ static void draw_tile_drawer(int tileset)
         {
             graphics.drawtile(labellen + 3, 45 - t2, ed.direct_mode_tile);
         }
+		else if(tileset==5){
+			graphics.drawtile3(labellen + 3, 45 - t2, ed.direct_mode_tile,0,0);
+		}
         else
         {
             graphics.drawtile2(labellen + 3, 45 - t2, ed.direct_mode_tile);
@@ -1141,11 +1143,13 @@ static void draw_tile_drawer(int tileset)
         font::print(PR_BOR, labellen + 16, y, help.String(ed.direct_mode_tile), 196, 196, 255 - help.glow);
         graphics.fill_rect(labellen + 2, y - 1, 10, 10, graphics.getRGB(255 - help.glow, 196, 196));
         graphics.fill_rect(labellen + 3, y, 8, 8, graphics.getRGB(0, 0, 0));
-
         if (tileset == 0)
         {
             graphics.drawtile(labellen + 3, 12, ed.direct_mode_tile);
         }
+		else if (tileset==5){
+			graphics.drawtile3(labellen + 3, 12, ed.direct_mode_tile,0,0);
+		}
         else
         {
             graphics.drawtile2(labellen + 3, 12, ed.direct_mode_tile);
@@ -2692,6 +2696,14 @@ static void handle_draw_input()
             ed.switch_tilecol(shift_down);
             ed.keydelay = 6;
         }
+		if (key.keymap[SDLK_SEMICOLON]){
+			ed.switch_towermode(shift_down);
+			ed.keydelay = 6;
+		}
+		if (key.keymap[SDLK_QUOTE]){
+			ed.switch_scrolldir(shift_down);
+			ed.keydelay = 6;
+		}
         if (key.keymap[SDLK_F3])
         {
             ed.switch_enemy(shift_down);
@@ -3779,9 +3791,9 @@ int editorclass::autotiling_base(int x, int y)
         return 80 + (room->tilecol * 3);
     }
     else if (room->tileset == 4)   //SHIP
-    {
-        return 101 + (room->tilecol * 3);
-    }
+	{
+		return 101 + (room->tilecol * 3);
+	}
     return 0;
 }
 
@@ -4166,7 +4178,7 @@ int editorclass::spikedir(int x, int y)
 
 void editorclass::switch_tileset(const bool reversed)
 {
-    const char* tilesets[] = {"Space Station", "Outside", "Lab", "Warp Zone", "Ship"};
+    const char* tilesets[] = {"Space Station", "Outside", "Lab", "Warp Zone", "Ship", "Tower"};
 
     int tiles = cl.getroomprop(levx, levy)->tileset;
 
@@ -4332,6 +4344,24 @@ void editorclass::switch_warpdir(const bool reversed)
     }
 
     graphics.backgrounddrawn = false;
+}
+
+void editorclass::switch_towermode(const bool reversed) {
+	const RoomProperty* const room = cl.getroomprop(levx, levy);
+	int mode = room->istower;
+	mode=!mode;
+	if(mode) show_note(loc::gettext("Tower enabled!"));
+	else show_note(loc::gettext("Tower disabled!"));
+	cl.setroomistower(levx, levy, mode);
+}
+
+void editorclass::switch_scrolldir(const bool reversed) {
+	const RoomProperty* const room = cl.getroomprop(levx, levy);
+	int dir = room->scrolldir;
+	dir=!dir;
+	if(dir) show_note(loc::gettext("Tower scroll direction set to DOWN"));
+	else show_note(loc::gettext("Tower scroll direction set to UP"));
+	cl.setroomscrolldir(levx, levy, dir);
 }
 
 #endif /* NO_CUSTOM_LEVELS and NO_EDITOR */

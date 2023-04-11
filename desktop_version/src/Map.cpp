@@ -1313,8 +1313,6 @@ void mapclass::loadlevel(int rx, int ry)
             exploretower();
         }
     }
-
-
     roomtexton = false;
     roomtext.clear();
     roomnameset = false;
@@ -1791,9 +1789,38 @@ void mapclass::loadlevel(int rx, int ry)
 
         setroomname(room->roomname.c_str());
         extrarow = 1;
-        const int* tmap = cl.loadlevel(rx, ry);
-        SDL_memcpy(contents, tmap, sizeof(contents));
-
+		const int* tmap;
+		if(room->istower){
+			towermode = true;
+			tower.customtowermode=true;
+			tileset = 1;
+			background = 3;
+			graphics.towerbg.scrolldir = room->scrolldir;
+			graphics.towerbg.tdrawback = true;
+			setbgobjlerp(graphics.towerbg);
+			int c = 0;
+			int d = 0;
+			if(room->scrolldir>0) d=1;
+			else d=-1;
+			tmap=cl.loadlevelchunk(rx,ry,c,d);
+//			SDL_memcpy(contents, tmap, sizeof(contents));
+			tower.towerheight = 30*(ry-100);
+			int i = obj.getplayer();
+			if(INBOUNDS_VEC(i, obj.entities)){
+				int theHolyPosition = (tower.towerheight)*8;
+				obj.entities[i].yp+=theHolyPosition;
+				obj.entities[i].lerpoldyp=obj.entities[i].yp;
+				ypos=theHolyPosition;
+				oldypos=ypos;
+			}
+			tower.loadCustomTower(tmap, 40, 30*((ry-100)+1));
+		}else{
+			ypos=0;
+			oldypos=0;
+			towermode=false;
+			tmap = cl.loadlevel(rx, ry);
+			SDL_memcpy(contents, tmap, sizeof(contents));
+		}
 
         roomtexton = false;
         roomtext.clear();

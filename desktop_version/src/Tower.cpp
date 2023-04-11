@@ -2,13 +2,19 @@
 
 #include <SDL_stdinc.h>
 #include <stddef.h>
+#include <sstream>
 
 #include "Constants.h"
 #include "MakeAndPlay.h"
 #include "UtilityClass.h"
+#include "CustomLevels.h"
+#include "Map.h"
+#include "Graphics.h"
+#include "Vlogging.h"
 
 towerclass::towerclass(void)
 {
+	towerheight=0;
     minitowermode = false;
     //We create a blank map
     SDL_memset(contents, 0, sizeof(contents));
@@ -37,6 +43,9 @@ int towerclass::at(int xp, int yp, int yoff)
     {
         return miniat(xp, yp, yoff);
     }
+	if(customtowermode){
+		return customat(xp, yp, yoff);
+	}
     else
     {
         yp = (yp*8 + yoff) / 8;
@@ -56,6 +65,25 @@ int towerclass::at(int xp, int yp, int yoff)
         }
         return 0;
     }
+}
+
+int towerclass::customat(int xp, int yp, int yoff){
+	yp = (yp*8 + yoff) / 8;
+
+	yp = POS_MOD(yp, towerheight);
+	if (xp >= 0 && xp < 40)
+	{
+		return customtower[TILE_IDX(xp,yp)];
+	}
+	else if (xp == -1)
+	{
+		return customtower[TILE_IDX(0,yp)];
+	}
+	else if (xp == 40)
+	{
+		return customtower[TILE_IDX(39,yp)];
+	}
+	return 0;
 }
 
 int towerclass::miniat(int xp, int yp, int yoff)
@@ -1137,4 +1165,14 @@ void towerclass::loadmap(void)
 
     SDL_memcpy(contents, tmap, sizeof(contents));
 #endif
+}
+
+void towerclass::loadCustomTower(const int* tmap, int rx, int ry) {
+	customtower.erase(customtower.begin(), customtower.end()); // clear out the last customtower
+	customtower.assign(tmap, tmap+(rx*ry));
+	std::stringstream bruh;
+	for(int i = 0; i<customtower.size();i++){
+		bruh<<customtower[i]<<",";
+	}
+	vlog_info("%s",bruh.str().c_str());
 }

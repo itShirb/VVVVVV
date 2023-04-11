@@ -34,8 +34,9 @@ public:
     FOREACH_PROP(enemyx2, int) \
     FOREACH_PROP(enemyy2, int) \
     FOREACH_PROP(enemytype, int) \
-    FOREACH_PROP(directmode, int)
-
+    FOREACH_PROP(directmode, int) \
+	FOREACH_PROP(istower, int) \
+	FOREACH_PROP(scrolldir, int)
 class RoomProperty
 {
 public:
@@ -108,6 +109,7 @@ public:
 
     void reset(void);
     const int* loadlevel(int rxi, int ryi);
+	const int* loadlevelchunk(int rxi, int ryi, int& c, int d);
 
     int gettileidx(
       const int rx,

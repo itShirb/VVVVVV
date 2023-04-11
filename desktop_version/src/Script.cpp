@@ -325,6 +325,10 @@ void scriptclass::run(void)
                     map.customshowmm=false;
                 }
             }
+			if (words[0] == "sdelay") {
+				scriptdelay = ss_toi(words[1]);
+				scriptallowmove = true;
+			}
             if (words[0] == "delay")
             {
                 //USAGE: delay(frames)
@@ -350,6 +354,11 @@ void scriptclass::run(void)
                 //USAGE: flash(frames)
                 game.flashlight = ss_toi(words[1]);
             }
+			if (words[0]=="cflash") {
+				game.flashlight = ss_toi(words[1]);
+				music.playef(ss_toi(words[2]));
+				game.screenshake = ss_toi(words[3]);
+			}
             if (words[0] == "shake")
             {
                 //USAGE: shake(frames)
@@ -2444,6 +2453,9 @@ void scriptclass::run(void)
     if(scriptdelay>0)
     {
         scriptdelay--;
+		if(scriptdelay<=0) {
+			scriptallowmove = false;
+		}
     }
 }
 
@@ -2903,7 +2915,6 @@ void scriptclass::startgamemode(const enum StartMode mode)
 
     map.resetplayer();
     map.gotoroom(game.saverx, game.savery);
-	vlog_info("currently here");
     map.initmapdata();
 #ifndef NO_CUSTOM_LEVELS
     if (map.custommode)
@@ -3424,6 +3435,7 @@ bool scriptclass::loadcustom(const std::string& t)
             }
         }else if(words[0] == "delay"){
             if(customtextmode==1){ add("endtext"); customtextmode=0;}
+			add("nocontrol()");
             add(lines[i]);
         }else if(words[0] == "flag"){
             if(customtextmode==1){ add("endtext"); customtextmode=0;}

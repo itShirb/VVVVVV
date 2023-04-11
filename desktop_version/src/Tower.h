@@ -1,6 +1,8 @@
 #ifndef TOWER_H
 #define TOWER_H
 
+#include <vector>
+
 class towerclass
 {
 public:
@@ -12,11 +14,15 @@ public:
 
     int miniat(int xp, int yp, int yoff);
 
+	int customat(int xp, int yp, int yoff);
+
     void loadminitower1(void);
 
     void loadminitower2(void);
 
     void loadbackground(void);
+
+	void loadCustomTower(const int* tmap, int rx, int ry);
 
     void loadmap(void);
 
@@ -24,7 +30,11 @@ public:
     short contents[40 * 700];
     short minitower[40 * 100];
 
+	int towerheight;
+	std::vector<int> customtower;
+
     bool minitowermode;
+	bool customtowermode;
 };
 
 

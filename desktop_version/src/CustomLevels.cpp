@@ -62,6 +62,8 @@ RoomProperty::RoomProperty(void)
     enemyy2=240;
     enemytype=0;
     directmode=0;
+	istower=0;
+	scrolldir=0;
 }
 
 customlevelclass::customlevelclass(void)
@@ -380,6 +382,8 @@ void customlevelclass::reset(void)
             roomproperties[i+(j*maxwidth)].enemyy2=240;
             roomproperties[i+(j*maxwidth)].enemytype=0;
             roomproperties[i+(j*maxwidth)].directmode=0;
+			roomproperties[i+(j*maxwidth)].istower=0;
+			roomproperties[i+(j*maxwidth)].scrolldir=0;
         }
     }
 
@@ -413,32 +417,60 @@ const int* customlevelclass::loadlevel( int rxi, int ryi )
             result[i + j*40] = gettile(rxi, ryi, i, j);
         }
     }
-
+	vlog_info("from normal load level: current loaded room is apparently: %i,%i",rxi,ryi);
     return result;
 }
 
-int customlevelclass::getlevelcol(const int tileset, const int tilecol)
-{
-    if(tileset==0)  //Space Station
-    {
-        return tilecol;
-    }
-    else if(tileset==1)   //Outside
-    {
-        return 32+tilecol;
-    }
-    else if(tileset==2)   //Lab
-    {
-        return 40+tilecol;
-    }
-    else if(tileset==3)   //Warp Zone
-    {
-        return 46+tilecol;
-    }
-    else if(tileset==4)   //Ship
-    {
-        return 52+tilecol;
-    }
+const int *customlevelclass::loadlevelchunk(int rxi, int ryi, int& c, int d) {
+	std::vector<int> room;
+	static std::vector<int> result;
+	result.clear();
+	rxi -= 100;
+	ryi -= 100;
+	if(rxi<0)rxi+=mapwidth;
+	if(ryi<0)ryi+=mapheight;
+	if(rxi>=mapwidth)rxi-=mapwidth;
+	if(ryi>=mapheight)ryi-=mapheight;
+	std::stringstream bruh;
+	while(true){
+		const RoomProperty* const nr = getroomprop(rxi, ryi+c);
+		if(!nr->istower) {
+			vlog_info("room at %i,%i is not tower. istower status:%b", rxi,ryi+c,nr->istower);
+			return result.data();
+		}
+		for (int j = 0; j < 30; j++)
+		{
+			for (int i = 0; i < 40; i++)
+			{
+				room.push_back(gettile(rxi, ryi+c, i, j));
+			}
+		}
+		result.insert(result.begin(), room.begin(), room.end());
+		room.clear();
+		c+=d;
+	}
+	return result.data();
+}
+
+int customlevelclass::getlevelcol(const int tileset, const int tilecol) {
+	if (tileset == 0)  //Space Station
+	{
+		return tilecol;
+	} else if (tileset == 1)   //Outside
+	{
+		return 32 + tilecol;
+	} else if (tileset == 2)   //Lab
+	{
+		return 40 + tilecol;
+	} else if (tileset == 3)   //Warp Zone
+	{
+		return 46 + tilecol;
+	} else if (tileset == 4)   //Ship
+	{
+		return 52 + tilecol;
+	} else if (tileset == 5){ //Tower???
+		return 58 + tilecol;
+	}
     return 0;
 }
 
@@ -1245,6 +1277,8 @@ bool customlevelclass::load(std::string _path)
                 edLevelClassElement->QueryIntAttribute("enemyy2", &roomproperties[i].enemyy2);
                 edLevelClassElement->QueryIntAttribute("enemytype", &roomproperties[i].enemytype);
                 edLevelClassElement->QueryIntAttribute("directmode", &roomproperties[i].directmode);
+                edLevelClassElement->QueryIntAttribute("istower", &roomproperties[i].istower);
+                edLevelClassElement->QueryIntAttribute("scrolldir", &roomproperties[i].scrolldir);
 
                 edLevelClassElement->QueryIntAttribute("warpdir", &roomproperties[i].warpdir);
 
@@ -1615,6 +1649,8 @@ bool customlevelclass::save(const std::string& _path)
         roompropertyElement->SetAttribute(  "enemytype", roomproperties[i].enemytype);
         roompropertyElement->SetAttribute(  "directmode", roomproperties[i].directmode);
         roompropertyElement->SetAttribute(  "warpdir", roomproperties[i].warpdir);
+        roompropertyElement->SetAttribute(  "istower", roomproperties[i].istower);
+        roompropertyElement->SetAttribute(  "scrolldir", roomproperties[i].scrolldir);
 
         roompropertyElement->LinkEndChild( doc.NewText( roomproperties[i].roomname.c_str() )) ;
         msg->LinkEndChild( roompropertyElement );
