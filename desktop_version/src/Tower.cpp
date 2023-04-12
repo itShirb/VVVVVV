@@ -70,7 +70,9 @@ int towerclass::at(int xp, int yp, int yoff)
 int towerclass::customat(int xp, int yp, int yoff){
 	yp = (yp*8 + yoff) / 8;
 
-	yp = POS_MOD(yp, towerheight);
+	// because for some kind of unholy reason it wants an offset
+	if(towerdir) yp = toweroffset ? POS_MOD(yp, towerheight+30) : POS_MOD(yp, towerheight+49);
+	else yp = toweroffset ? POS_MOD(yp, towerheight+30) : POS_MOD(yp, towerheight+29);
 	if (xp >= 0 && xp < 40)
 	{
 		return customtower[TILE_IDX(xp,yp)];

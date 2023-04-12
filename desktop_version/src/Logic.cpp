@@ -10,6 +10,8 @@
 #include "Network.h"
 #include "Script.h"
 #include "UtilityClass.h"
+#include "Vlogging.h"
+#include "CustomLevels.h"
 
 void titlelogic(void)
 {
@@ -231,6 +233,7 @@ void gamelogic(void)
     if (map.towermode)
     {
         map.oldypos = map.ypos;
+		map.tower.oldtowerprogress=map.tower.towerprogress;
         map.oldspikeleveltop = map.spikeleveltop;
         map.oldspikelevelbottom = map.spikelevelbottom;
         if(!game.completestop)
@@ -247,10 +250,12 @@ void gamelogic(void)
                 if(graphics.towerbg.scrolldir==0)
                 {
                     map.ypos -= 2;
+					map.tower.towerprogress-=2; // update tower progress for customtowers to work and know where the hell they are
                 }
                 else
                 {
                     map.ypos += 2;
+					map.tower.towerprogress+=2;
                 }
             }
             else if (map.cameramode == 2)
@@ -279,11 +284,13 @@ void gamelogic(void)
                 {
                     int i = obj.getplayer();
                     map.ypos -= map.cameraseek;
+					map.tower.towerprogress-=map.cameraseek;
                     if (map.cameraseek > 0 && INBOUNDS_VEC(i, obj.entities))
                     {
                         if (map.ypos < obj.entities[i].yp - 120)
                         {
                             map.ypos = obj.entities[i].yp - 120;
+                            map.tower.towerprogress = obj.entities[i].yp - 120;
                         }
                     }
                     else if (INBOUNDS_VEC(i, obj.entities))
@@ -291,6 +298,7 @@ void gamelogic(void)
                         if (map.ypos > obj.entities[i].yp - 120)
                         {
                             map.ypos = obj.entities[i].yp - 120;
+                            map.tower.towerprogress = obj.entities[i].yp - 120;
                         }
                     }
                     map.cameraseekframe--;
@@ -301,6 +309,7 @@ void gamelogic(void)
                     if (INBOUNDS_VEC(i, obj.entities))
                     {
                         map.ypos = obj.entities[i].yp - 120;
+						map.tower.towerprogress = obj.entities[i].yp-120;
                     }
                     map.cameramode = 0;
                     map.colsuperstate = 0;
@@ -308,9 +317,19 @@ void gamelogic(void)
             }
         }
 
-        if (map.ypos <= 0)
+		if(map.tower.towerprogress<=0) {
+			map.tower.towerprogress=map.ypos; // no matter how it hits zero it should sync with map y pos
+		}
+		if((((map.tower.towerprogress<=170&&map.ypos>=114)&&map.tower.towerprogress!=map.ypos)||(map.tower.towerprogress<=abs(map.ypos-map.tower.towerprogress)&&map.ypos<=0))){
+			map.tower.towerprogress = 0;
+		}
+		if(map.tower.towerprogress>=(map.tower.towerheight*8*30)){
+			map.tower.towerprogress=map.tower.towerheight*8*30;
+		}
+        if (map.ypos <= 0 || map.tower.towerheight<=1)
         {
             map.ypos = 0;
+			map.tower.towerprogress = 0;
         }
         if (map.towermode && map.minitowermode)
         {
@@ -321,7 +340,7 @@ void gamelogic(void)
         }
         else
         {
-            if (map.ypos >= 5368)
+            if (map.ypos >= 5368&&!map.tower.customtowermode)
             {
                 map.ypos = 5368;    //700-29 * 8 = 5368
             }
@@ -916,7 +935,7 @@ void gamelogic(void)
                     const bool above_screen = obj.entities[player].yp-map.ypos <= 8;
                     const bool below_screen = obj.entities[player].yp-map.ypos >= 200;
 
-                    if (above_screen)
+                    if (above_screen && map.tower.towerheight!=0)
                     {
                         if (obj.entities[player].yp - map.ypos <= 0)
                         {
@@ -925,6 +944,7 @@ void gamelogic(void)
                                 /* Descending tower:
                                  * Counteract 10 pixels of terminal velocity
                                  * + 2 pixels of camera movement */
+								map.tower.towerprogress-=12;
                                 map.ypos -= 12;
                             }
                             else
@@ -932,16 +952,18 @@ void gamelogic(void)
                                 /* Ascending tower:
                                  * Move 8 out of 10 pixels of terminal velocity
                                  * Camera movement will move 2 pixels for us */
+								map.tower.towerprogress-=8;
                                 map.ypos -= 8;
                             }
                         }
                         else
                         {
                             /* Counter 2 pixels of camera movement */
+							map.tower.towerprogress-=2;
                             map.ypos -= 2;
                         }
                     }
-                    else if (below_screen)
+                    else if (below_screen && map.tower.towerheight!=0)
                     {
                         if (obj.entities[player].yp - map.ypos >= 208)
                         {
@@ -950,6 +972,7 @@ void gamelogic(void)
                                 /* Ascending tower:
                                  * Counteract 10 pixels of terminal velocity
                                  * + 2 pixels of camera movement */
+								map.tower.towerprogress+=12;
                                 map.ypos += 12;
                             }
                             else
@@ -957,12 +980,14 @@ void gamelogic(void)
                                 /* Descending tower:
                                  * Move 8 out of 10 pixels of terminal velocity
                                  * Camera movement will move 2 pixels for us */
+								map.tower.towerprogress+=8;
                                 map.ypos += 8;
                             }
                         }
                         else
                         {
                             /* Counter 2 pixels of camera movement */
+							map.tower.towerprogress+=2;
                             map.ypos += 2;
                         }
                     }
@@ -1221,8 +1246,40 @@ void gamelogic(void)
         }
         else if (map.towermode)
         {
+			int plr = obj.getplayer();
+			vlog_info("player y: %i\nmap ypos: %i\ntowerprog: %i",obj.entities[plr].yp,map.ypos,map.tower.towerprogress);
+			if(map.tower.customtowermode){ // override everything, custom tower rules apply
+				if(map.tower.towerprogress>60&&map.tower.towerprogress<=map.tower.towerheight*8-120){
+					for (size_t i = 0; i < obj.entities.size();  i++)
+					{
+						if (obj.entities[i].xp <= -10)
+						{
+							obj.entities[i].xp += 320;
+							obj.entities[i].lerpoldxp += 320;
+						}
+						else if (obj.entities[i].xp > 310)
+						{
+							obj.entities[i].xp -= 320;
+							obj.entities[i].lerpoldxp -= 320;
+						}
+					}
+				}
+				else{
+					if (INBOUNDS_VEC(plr, obj.entities) && obj.entities[plr].xp < -14)
+					{
+						obj.entities[plr].xp += 320;
+						obj.entities[plr].yp -= ((map.tower.towerheight) * 8)-abs(map.ypos-map.tower.towerprogress);
+						GOTOROOM(game.roomx-1, game.roomy);
+					}
+					if (INBOUNDS_VEC(plr, obj.entities) && obj.entities[plr].xp >= 308)
+					{
+						obj.entities[plr].xp -= 320;
+						GOTOROOM(game.roomx+1, game.roomy+map.tower.towerheight);
+					}
+				}
+			}
             //Always wrap except for the very top and very bottom of the tower
-            if(map.ypos>=500 && map.ypos <=5000)
+            else if(map.ypos>=500 && map.ypos <=5000)
             {
                 for (size_t i = 0; i < obj.entities.size();  i++)
                 {

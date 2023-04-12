@@ -828,11 +828,13 @@ void mapclass::resetplayer(const bool player_died)
         if (!was_in_tower && towermode)
         {
             ypos = obj.entities[i].yp - 120;
+			tower.towerprogress=obj.entities[i].yp-120;
             if (ypos < 0)
             {
                 ypos = 0;
             }
             oldypos = ypos;
+			tower.oldtowerprogress = tower.towerprogress;
             setbgobjlerp(graphics.towerbg);
         }
     }
@@ -1795,7 +1797,9 @@ void mapclass::loadlevel(int rx, int ry)
 			tower.customtowermode=true;
 			tileset = 1;
 			background = 3;
+			cameramode=0;
 			graphics.towerbg.scrolldir = room->scrolldir;
+			tower.towerdir = room->scrolldir;
 			graphics.towerbg.tdrawback = true;
 			setbgobjlerp(graphics.towerbg);
 			int c = 0;
@@ -1804,16 +1808,27 @@ void mapclass::loadlevel(int rx, int ry)
 			else d=-1;
 			tmap=cl.loadlevelchunk(rx,ry,c,d);
 //			SDL_memcpy(contents, tmap, sizeof(contents));
-			tower.towerheight = 30*(ry-100);
+			tower.towerheight = (30*(ry-100)+abs(c));
+			//annoyingly i have to do another room->scrolldir>0 check because only now is c updated
+			if(room->scrolldir>0) tower.towerprogress=0;
+			else tower.towerprogress=tower.towerheight*8;
 			int i = obj.getplayer();
 			if(INBOUNDS_VEC(i, obj.entities)){
-				int theHolyPosition = (tower.towerheight)*8;
+				int theHolyPosition = (tower.towerheight-abs(c))*8;
+				if((obj.entities[i].yp>=theHolyPosition*30&&room->scrolldir==0)||(obj.entities[i].yp<=theHolyPosition&&room->scrolldir==1)){
+					tower.toweroffset=true;
+					tower.towerheight=0;
+				}
+				else tower.toweroffset = false;
 				obj.entities[i].yp+=theHolyPosition;
 				obj.entities[i].lerpoldyp=obj.entities[i].yp;
 				ypos=theHolyPosition;
 				oldypos=ypos;
 			}
-			tower.loadCustomTower(tmap, 40, 30*((ry-100)+1));
+			tower.loadCustomTower(tmap, 40, 30*((abs(c))));
+			tower.towerypos=ry-100;
+			tower.towerxpos=rx-100;
+			tower.towerroomcount=abs(c);
 		}else{
 			ypos=0;
 			oldypos=0;

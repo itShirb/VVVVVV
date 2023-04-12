@@ -2932,6 +2932,7 @@ void scriptclass::startgamemode(const enum StartMode mode)
         if (INBOUNDS_VEC(i, obj.entities))
         {
             map.ypos = obj.entities[i].yp - 120;
+            map.tower.towerprogress = obj.entities[i].yp - 120;
             map.oldypos = map.ypos;
         }
         map.setbgobjlerp(graphics.towerbg);

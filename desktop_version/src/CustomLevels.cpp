@@ -431,7 +431,6 @@ const int *customlevelclass::loadlevelchunk(int rxi, int ryi, int& c, int d) {
 	if(ryi<0)ryi+=mapheight;
 	if(rxi>=mapwidth)rxi-=mapwidth;
 	if(ryi>=mapheight)ryi-=mapheight;
-	std::stringstream bruh;
 	while(true){
 		const RoomProperty* const nr = getroomprop(rxi, ryi+c);
 		if(!nr->istower) {
@@ -445,7 +444,8 @@ const int *customlevelclass::loadlevelchunk(int rxi, int ryi, int& c, int d) {
 				room.push_back(gettile(rxi, ryi+c, i, j));
 			}
 		}
-		result.insert(result.begin(), room.begin(), room.end());
+		if(!map.tower.towerdir) result.insert(result.begin(), room.begin(), room.end());
+		else result.insert(result.end(), room.begin(), room.end());
 		room.clear();
 		c+=d;
 	}

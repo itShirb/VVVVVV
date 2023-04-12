@@ -1990,7 +1990,9 @@ void Graphics::drawentity(const int i, const int yoff)
         }
 
         const bool isInWrappingAreaOfTower = map.towermode && !map.minitowermode && map.ypos >= 500 && map.ypos <= 5000;
-        if (wrapX && (map.warpx || isInWrappingAreaOfTower))
+		//because for some reason this check is performed twice
+		bool isInWrappingAreaOfCustomTower = map.towermode && map.tower.customtowermode && (map.tower.towerprogress>=60&&map.tower.towerprogress<=map.tower.towerheight*8-120);
+        if (wrapX && (map.warpx || isInWrappingAreaOfTower || isInWrappingAreaOfCustomTower))
         {
             drawRect = sprites_rect;
             drawRect.x += wrappedPoint.x;

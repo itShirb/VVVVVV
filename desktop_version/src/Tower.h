@@ -30,7 +30,7 @@ public:
     short contents[40 * 700];
     short minitower[40 * 100];
 
-	int towerheight;
+	int towerheight, towerypos, towerxpos, towerroomcount, towerprogress, oldtowerprogress, towerdir, toweroffset;
 	std::vector<int> customtower;
 
     bool minitowermode;
